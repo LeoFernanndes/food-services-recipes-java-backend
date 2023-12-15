@@ -1,12 +1,13 @@
 package com.foodservices.foodservicesrecipes.controller;
 
-import com.foodservices.foodservicesrecipes.EnvFileProperties;
+
 import com.foodservices.foodservicesrecipes.dto.RecipeCreateDTO;
 import com.foodservices.foodservicesrecipes.dto.RecipeDTO;
 import com.foodservices.foodservicesrecipes.dto.RecipeUpdateDTO;
 import com.foodservices.foodservicesrecipes.entity.Recipe;
 import com.foodservices.foodservicesrecipes.repository.RecipeRepository;
-import com.foodservices.foodservicesrecipes.service.AuthTokenService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class RecipeController {
 
     private RecipeRepository recipeRepository;
+    private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
 
     public RecipeController(RecipeRepository recipeRepository){
         this.recipeRepository = recipeRepository;
