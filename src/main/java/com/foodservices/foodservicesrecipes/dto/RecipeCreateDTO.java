@@ -1,4 +1,4 @@
-package com.foodservices.foodservicesrecipes.controller.dto;
+package com.foodservices.foodservicesrecipes.dto;
 
 import com.foodservices.foodservicesrecipes.entity.Recipe;
 
