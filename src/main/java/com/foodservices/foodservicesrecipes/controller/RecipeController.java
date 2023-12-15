@@ -1,11 +1,12 @@
 package com.foodservices.foodservicesrecipes.controller;
 
-import com.foodservices.foodservicesrecipes.controller.dto.RecipeCreateDTO;
-import com.foodservices.foodservicesrecipes.controller.dto.RecipeDTO;
-import com.foodservices.foodservicesrecipes.controller.dto.RecipeUpdateDTO;
+import com.foodservices.foodservicesrecipes.EnvFileProperties;
+import com.foodservices.foodservicesrecipes.dto.RecipeCreateDTO;
+import com.foodservices.foodservicesrecipes.dto.RecipeDTO;
+import com.foodservices.foodservicesrecipes.dto.RecipeUpdateDTO;
 import com.foodservices.foodservicesrecipes.entity.Recipe;
 import com.foodservices.foodservicesrecipes.repository.RecipeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.foodservices.foodservicesrecipes.service.AuthTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,11 @@ import java.util.Optional;
 @RestController
 public class RecipeController {
 
-    @Autowired
     private RecipeRepository recipeRepository;
+
+    public RecipeController(RecipeRepository recipeRepository){
+        this.recipeRepository = recipeRepository;
+    }
 
     @GetMapping("/recipes/{id}")
     public RecipeDTO retrieve(@PathVariable Long id){
