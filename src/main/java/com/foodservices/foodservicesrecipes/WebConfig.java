@@ -13,10 +13,6 @@ public class WebConfig implements WebMvcConfigurer {
         this.requestInterceptor = requestInterceptor;
     }
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(new RequestInterceptor());
-//    }
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(requestInterceptor);
