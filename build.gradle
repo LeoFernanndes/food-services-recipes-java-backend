@@ -34,9 +34,9 @@ if (propertiesFile.exists()) {
 }
 
 flyway {
-	url = 'jdbc:postgresql://' + env.DATABASE_HOST.value + ':' + env.DATABASE_PORT.value + '/' + env.DATABASE.value
-	user = env.DATABASE_USERNAME.value
-	password = env.DATABASE_PASSWORD.value
+	url = 'jdbc:postgresql://' + env.DATABASE_HOST.orElse("host") + ':' + env.DATABASE_PORT.orElse("port") + '/' + env.DATABASE.orElse("database")
+	user = env.DATABASE_USERNAME.orElse("user")
+	password = env.DATABASE_PASSWORD.orElse("password")
 	table = 'db_migrations'
 //	TODO: Understand why classpath works in application.properties but does not work here
 //	locations = 'classpath:db/migration/postgresql'
