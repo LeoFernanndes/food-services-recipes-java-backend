@@ -31,4 +31,16 @@ public class RecipeCreateDTO {
     public String getRecipe() {
         return recipe;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPreparationTimeMinutes(Integer preparationTimeMinutes) {
+        this.preparationTimeMinutes = preparationTimeMinutes;
+    }
+
+    public void setRecipe(String recipe) {
+        this.recipe = recipe;
+    }
 }

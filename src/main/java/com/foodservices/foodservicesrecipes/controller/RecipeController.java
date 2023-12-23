@@ -1,10 +1,13 @@
 package com.foodservices.foodservicesrecipes.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.foodservices.foodservicesrecipes.dto.RecipeCreateDTO;
 import com.foodservices.foodservicesrecipes.dto.RecipeDTO;
 import com.foodservices.foodservicesrecipes.dto.RecipeUpdateDTO;
 import com.foodservices.foodservicesrecipes.entity.Recipe;
+import com.foodservices.foodservicesrecipes.infra.amqp.ProduceMessageService;
+import com.foodservices.foodservicesrecipes.infra.amqp.message.recipe.RecipeCreateMessage;
 import com.foodservices.foodservicesrecipes.repository.RecipeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +22,17 @@ import java.util.Optional;
 @RestController
 public class RecipeController {
 
+//    @Autowired
+    private ProduceMessageService produceMessageService;
     private RecipeRepository recipeRepository;
     private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
 
-    public RecipeController(RecipeRepository recipeRepository){
+    public RecipeController(
+            RecipeRepository recipeRepository,
+            ProduceMessageService produceMessageService
+            ){
         this.recipeRepository = recipeRepository;
+        this.produceMessageService = produceMessageService;
     }
 
     @GetMapping("/recipes/{id}")
@@ -47,10 +56,16 @@ public class RecipeController {
     @Transactional
     @PostMapping(value = "/recipes")
     @ResponseStatus(HttpStatus.CREATED)
-    public RecipeDTO post(@RequestBody RecipeCreateDTO recipe){
+    public RecipeDTO post(@RequestBody RecipeCreateDTO recipe) throws JsonProcessingException {
         Recipe newRecipe = recipe.convertEntityToDto();
         Recipe createdRecipe =  recipeRepository.save(newRecipe);
-        return new RecipeDTO(createdRecipe);
+        RecipeDTO createdRecipeDTO = new RecipeDTO(createdRecipe);
+
+        RecipeCreateMessage recipeCreateMessage = new RecipeCreateMessage();
+        recipeCreateMessage.setData(createdRecipeDTO);
+        produceMessageService.produceMessage(recipeCreateMessage);
+
+        return createdRecipeDTO;
     }
 
     @Transactional
