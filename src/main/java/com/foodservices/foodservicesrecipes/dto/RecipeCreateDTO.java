@@ -15,7 +15,7 @@ public class RecipeCreateDTO {
         this.recipe = recipe.getRecipe();
     }
 
-    public Recipe convertEntityToDto(){
+    public Recipe generateEntity(){
         Recipe newRecipe = new Recipe(this.name, this.preparationTimeMinutes, this.recipe);
         return newRecipe;
     }

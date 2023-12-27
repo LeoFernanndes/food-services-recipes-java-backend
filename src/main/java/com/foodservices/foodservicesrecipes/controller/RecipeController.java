@@ -57,7 +57,7 @@ public class RecipeController {
     @PostMapping(value = "/recipes")
     @ResponseStatus(HttpStatus.CREATED)
     public RecipeDTO post(@RequestBody RecipeCreateDTO recipe) throws JsonProcessingException {
-        Recipe newRecipe = recipe.convertEntityToDto();
+        Recipe newRecipe = recipe.generateEntity();
         Recipe createdRecipe =  recipeRepository.save(newRecipe);
         RecipeDTO createdRecipeDTO = new RecipeDTO(createdRecipe);
 
