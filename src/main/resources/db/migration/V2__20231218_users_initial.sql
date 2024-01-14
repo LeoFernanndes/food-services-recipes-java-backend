@@ -1,6 +1,6 @@
-create table "user"
+create table users
 (
-    id bigint not null primary key,
+    id varchar not null primary key,
     first_name varchar(255),
     last_name varchar(255),
     age int,

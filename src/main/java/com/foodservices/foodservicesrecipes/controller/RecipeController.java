@@ -1,14 +1,14 @@
 package com.foodservices.foodservicesrecipes.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.foodservices.foodservicesrecipes.dto.RecipeCreateDTO;
-import com.foodservices.foodservicesrecipes.dto.RecipeDTO;
-import com.foodservices.foodservicesrecipes.dto.RecipeUpdateDTO;
+import com.foodservices.foodservicesrecipes.dto.recipe.*;
+import com.foodservices.foodservicesrecipes.entity.Ingredient;
 import com.foodservices.foodservicesrecipes.entity.Recipe;
 import com.foodservices.foodservicesrecipes.infra.amqp.ProduceMessageService;
-import com.foodservices.foodservicesrecipes.infra.amqp.message.recipe.RecipeCreateMessage;
+import com.foodservices.foodservicesrecipes.repository.IngredientRepository;
 import com.foodservices.foodservicesrecipes.repository.RecipeRepository;
+import com.foodservices.foodservicesrecipes.service.RecipeService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,27 +19,34 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: Add a handler to return formatted error messages in 400 responses
+
 @RestController
 public class RecipeController {
 
-//    @Autowired
     private ProduceMessageService produceMessageService;
     private RecipeRepository recipeRepository;
+    private IngredientRepository ingredientRepository;
+    private RecipeService recipeService;
     private static final Logger logger = LoggerFactory.getLogger(RecipeController.class);
 
     public RecipeController(
             RecipeRepository recipeRepository,
-            ProduceMessageService produceMessageService
+            IngredientRepository ingredientRepository,
+            ProduceMessageService produceMessageService,
+            RecipeService recipeService
             ){
         this.recipeRepository = recipeRepository;
+        this.ingredientRepository = ingredientRepository;
         this.produceMessageService = produceMessageService;
+        this.recipeService = recipeService;
     }
 
     @GetMapping("/recipes/{id}")
-    public RecipeDTO retrieve(@PathVariable Long id){
+    public Recipe retrieve(@PathVariable String id){
         Optional<Recipe> recipe = recipeRepository.findById(id);
         if (recipe.isPresent()) {
-            return new RecipeDTO(recipe.get());
+            return recipe.get();
         } else {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Not found"
@@ -55,30 +62,22 @@ public class RecipeController {
 
     @Transactional
     @PostMapping(value = "/recipes")
-    @ResponseStatus(HttpStatus.CREATED)
-    public RecipeDTO post(@RequestBody RecipeCreateDTO recipe) throws JsonProcessingException {
-        Recipe newRecipe = recipe.generateEntity();
-        Recipe createdRecipe =  recipeRepository.save(newRecipe);
-        RecipeDTO createdRecipeDTO = new RecipeDTO(createdRecipe);
-
-        RecipeCreateMessage recipeCreateMessage = new RecipeCreateMessage();
-        recipeCreateMessage.setData(createdRecipeDTO);
-        produceMessageService.produceMessage(recipeCreateMessage);
-
-        return createdRecipeDTO;
+    public Recipe createRecipe(@RequestBody @Valid RecipeCreateDTO recipeCreateDTO) {
+        Recipe createdRecipe = recipeService.createRecipe(recipeCreateDTO);
+        return createdRecipe;
     }
 
     @Transactional
     @PutMapping("/recipes/{id}")
-    public RecipeDTO update(@RequestBody RecipeUpdateDTO recipe, @PathVariable Long id){
+    public Recipe update(@RequestBody @Valid RecipeDTO recipeDTO, @PathVariable String id) throws IllegalAccessException {
         Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
         if (optionalRecipe.isPresent()) {
-            Recipe updatedRecipeBeforeSave = recipe.updateEntityFromDto(optionalRecipe.get());
-            Recipe updatedRecipeAfterSave = recipeRepository.save(updatedRecipeBeforeSave);
-            return new RecipeDTO(updatedRecipeAfterSave);
+            Recipe oldRecipe = optionalRecipe.get();
+            Recipe returnedRecipe = recipeService.nullSafeUpdateRecipe(recipeDTO, oldRecipe);
+            return returnedRecipe;
         } else {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Not found"
+                HttpStatus.NOT_FOUND, "Not found"
             );
         }
     }
@@ -86,14 +85,58 @@ public class RecipeController {
     @Transactional
     @DeleteMapping("/recipes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id){
+    public void delete(@PathVariable String id){
         Optional<Recipe> recipe = recipeRepository.findById(id);
         if (recipe.isPresent()) {
+            recipeRepository.deleteById(id);
             return;
         } else {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Not found"
             );
         }
+    }
+    @Transactional
+    @PutMapping("/recipes/{recipeId}/ingredients/{ingredientId}")
+    public Ingredient updateIngredient(@PathVariable String recipeId, @PathVariable String ingredientId, @RequestBody @Valid IngredientUpdateDTO ingredientUpdateDTO) throws IllegalAccessException {
+        Optional<Recipe> optionalRecipe = recipeRepository.findById(recipeId);
+        if (optionalRecipe.isPresent()) {
+            Optional<Ingredient> ingredient = ingredientRepository.findById(ingredientId);
+            if (ingredient.isPresent()) {
+                Ingredient updatedIngredient = recipeService.nullSafeUpdateIngredient(ingredientUpdateDTO, ingredient.get());
+                return updatedIngredient;
+            }
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Not found"
+        );
+    }
+
+    @Transactional
+    @PostMapping("/recipes/{recipeId}/ingredients")
+    public Ingredient createIngredient(@PathVariable String recipeId, @RequestBody @Valid IngredientCreateDTO ingredientCreateDTO){
+        Optional<Recipe> optionalRecipe = recipeRepository.findById(recipeId);
+        if (optionalRecipe.isPresent()){
+            Ingredient ingredient = recipeService.createIngredient(optionalRecipe.get(), ingredientCreateDTO);
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Not found"
+        );
+    }
+
+    @Transactional
+    @DeleteMapping("/recipes/{recipeId}/ingredients/{ingredientId}")
+    public void deleteIngredient(@PathVariable String recipeId, @PathVariable String ingredientId){
+        Optional<Recipe> recipe = recipeRepository.findById(recipeId);
+        if (recipe.isPresent()) {
+            Optional<Ingredient> ingredient = ingredientRepository.findById(ingredientId);
+            if (ingredient.isPresent()){
+                ingredientRepository.delete(ingredient.get());
+                return;
+            }
+        }
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Not found"
+        );
     }
 }

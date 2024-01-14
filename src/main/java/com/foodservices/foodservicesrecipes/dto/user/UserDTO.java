@@ -1,13 +1,13 @@
-package com.foodservices.foodservicesrecipes.dto;
+package com.foodservices.foodservicesrecipes.dto.user;
 
 import com.foodservices.foodservicesrecipes.entity.User;
 
 public class UserDTO {
-    private Long id;
+    private String id;
     private String firstName;
     private String lastName;
     private Integer age;
-    private String userName;
+    private String username;
 
     public UserDTO(){};
 
@@ -16,14 +16,14 @@ public class UserDTO {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.age = user.getAge();
-        this.userName = user.getUsername();
+        this.username = user.getUsername();
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -51,12 +51,12 @@ public class UserDTO {
         this.age = age;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public User generateEntity() {
@@ -65,7 +65,7 @@ public class UserDTO {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setAge(age);
-        user.setUsername(userName);
+        user.setUsername(username);
         return user;
     }
 }

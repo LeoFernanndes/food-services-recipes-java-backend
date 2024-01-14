@@ -1,6 +1,7 @@
 package com.foodservices.foodservicesrecipes.infra.amqp;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foodservices.foodservicesrecipes.dto.UserDTO;
+import com.foodservices.foodservicesrecipes.dto.user.UserDTO;
 import com.foodservices.foodservicesrecipes.infra.amqp.message.auth.AuthCreateUserMessage;
 import com.foodservices.foodservicesrecipes.infra.amqp.message.auth.AuthLoginMessage;
 import com.foodservices.foodservicesrecipes.infra.amqp.message.auth.AuthUpdateUserMessage;
@@ -28,6 +29,7 @@ public class ConsumeMessageService {
     @RabbitListener(queues = "${env.rabbitmq.recipe.queue.name}")
     public void consumeRecipe(byte[] messageBody) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         BaseMessage incomingUnknownMessage = objectMapper.readValue(messageBody, BaseMessage.class);
         try {
             switch (incomingUnknownMessage.getAction()){

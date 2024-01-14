@@ -1,6 +1,6 @@
 package com.foodservices.foodservicesrecipes.useCase;
 
-import com.foodservices.foodservicesrecipes.dto.UserDTO;
+import com.foodservices.foodservicesrecipes.dto.user.UserDTO;
 import com.foodservices.foodservicesrecipes.entity.User;
 import com.foodservices.foodservicesrecipes.repository.UserRepository;
 import org.springframework.stereotype.Service;

@@ -1,0 +1,1 @@
+alter table recipes alter column id type varchar;
