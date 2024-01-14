@@ -1,6 +1,7 @@
 package com.foodservices.foodservicesrecipes.infra.amqp.message.recipe;
 
-import com.foodservices.foodservicesrecipes.dto.RecipeDTO;
+
+import com.foodservices.foodservicesrecipes.dto.recipe.RecipeDTO;
 import com.foodservices.foodservicesrecipes.infra.amqp.message.BaseMessage;
 
 import java.io.Serializable;

@@ -1,22 +1,23 @@
-package com.foodservices.foodservicesrecipes.entity;
+package com.foodservices.foodservicesrecipes.dto.user;
 
-import jakarta.persistence.*;
+import com.foodservices.foodservicesrecipes.entity.User;
 
-@Entity
-@Table(schema = "public", name = "users")
-public class User {
-    @Id
-//    @GeneratedValue
-    @Column(name = "id")
+public class UserDTO {
     private String id;
-    @Column(name = "first_name")
     private String firstName;
-    @Column(name = "last_name")
     private String lastName;
-    @Column(name = "age")
     private Integer age;
-    @Column(name = "username")
     private String username;
+
+    public UserDTO(){};
+
+    public UserDTO(User user){
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.age = user.getAge();
+        this.username = user.getUsername();
+    }
 
     public String getId() {
         return id;
@@ -56,5 +57,15 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public User generateEntity() {
+        User user = new User();
+        user.setId(id);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setAge(age);
+        user.setUsername(username);
+        return user;
     }
 }

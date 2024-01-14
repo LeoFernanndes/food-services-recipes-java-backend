@@ -1,4 +1,4 @@
-create table recipe
+create table recipes
 (
     id bigint not null primary key,
     name varchar(255),
